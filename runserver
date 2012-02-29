@@ -1,0 +1,62 @@
+#!/bin/bash
+if [ $# == 1 ]
+    then
+	DJANGO=`echo "$1" | tr "[:upper:]" "[:lower:]"`
+	CAP=`echo "${DJANGO:0:1}" | tr "[:lower:]" "[:upper:]"`
+	PARENT="${CAP}${DJANGO:1}"
+elif [ $# == 2 ]
+    then
+	PARENT=$1
+	DJANGO=$2
+else
+	echo "runserver expects at least one (1) argument and at most two (2) arguments:"
+	echo "1. When there is only one argument, runserver assumes that it is the Django"
+	echo "   project folder name and that there is a title-case named parent folder"
+	echo "   For example: runserver kernel will be interpreted to mean that the"
+	echo "   Django project folder is called 'kernel' and that it lives in a parent"
+	echo "   folder called 'Kernel' (in which also resides a virtualenv folder 'env'."
+	echo " "
+	echo "2. When there are two arguments, runserver assumes that the first is the"
+	echo "   parent folder and the second is the Django project folder name."
+	exit 1
+fi
+
+echo "project is $PARENT"
+echo "django dir is $DJANGO"
+
+
+PARENT_DIR="${HOME}/Sites/${PARENT}"
+if [ -d "$PARENT_DIR" ]
+# PARENT_DIR exists and is a directory!
+    then
+	DJANGO_DIR="${PARENT_DIR}/${DJANGO}"
+	if [ -d "$DJANGO_DIR" ]
+# DJANGO_DIR exists and is a directory!
+	    then
+		cd "$DJANGO_DIR" # Let's go there!
+	else 
+	    echo "No Django project found."
+	    echo "Looked for it at '$DJANGO_DIR'"
+	    exit 1
+	fi
+	ENV_PATH="${PARENT_DIR}/env/bin"
+	if [ -d "${ENV_PATH}" ]
+# ENV_PATH exists and is a directory!
+	    then
+		source "${ENV_PATH}/activate"
+	else
+	    echo "No virtual env source found."
+	    echo "Looked for it at '${ENV_PATH}'."
+	    exit 1
+	fi
+
+# If we've made it here, then it's safe to call dev_env
+	dev_env "$DJANGO"
+
+# If we've made it here, then it's safe to start Django's runserver
+	./manage.py runserver
+else
+    echo "Could not find parent directory."
+    echo "Looked for it at '$PARENT_DIR'."
+    exit 1
+fi

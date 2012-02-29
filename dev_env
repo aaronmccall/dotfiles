@@ -1,0 +1,42 @@
+#!/bin/bash
+if [ ! -f "/opt/local/sbin/nginx" ]
+    then
+	TOP_LEVEL="/usr/local"
+	PID="etc/nginx/nginx.pid"
+    else
+	TOP_LEVEL="/opt/local"
+	PID="var/run/nginx.pid"
+fi
+NGINX="${TOP_LEVEL}/sbin/nginx"
+ENABLED="${TOP_LEVEL}/etc/nginx/sites-enabled"
+AVAILABLE="${TOP_LEVEL}/etc/nginx/sites-available"
+
+echo "\$1 is $1"
+CONF="${1}.local"
+if [ -f "${AVAILABLE}/${CONF}" ]
+    then
+# if nginx is running, kill it
+	if [ -f "${TOP_LEVEL}/${PID}" ]
+	    then
+		echo "Stopping nginx..."
+		sudo kill `cat "${TOP_LEVEL}/${PID}"`
+	fi
+
+# iterate the files in sites-enabled and remove any that are not our target config
+	ls $ENABLED/*.local > _conf_list  
+	for i in `cat _conf_list`; do 
+	    if [ "${i}" != "${CONF}" ]
+		then
+		     sudo rm "${i}"
+	    fi
+	done
+	rm _conf_list
+
+# if our target config is not in sites-enabled, put it in there
+	if [ ! -f "${ENABLED}/${CONF}" ]
+	    then
+		sudo ln -s "${AVAILABLE}/${CONF}" "${ENABLED}/${CONF}"
+	fi
+# restart nginx
+	sudo "${TOP_LEVEL}/sbin/nginx"
+fi

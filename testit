@@ -1,0 +1,15 @@
+#!/bin/bash
+
+curdir=$PWD
+project=${PWD##*/}
+
+echo "Running tests for app: $1 in project: $project"
+
+if [ ! -f "${curdir}/manage.py" ]
+    then
+	echo "No manage.py to run the tests!";
+	exit 1;
+    else
+	CMD="python ${curdir}/manage.py test $1"
+	$CMD
+fi 
