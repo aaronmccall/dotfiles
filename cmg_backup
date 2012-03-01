@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ ! -d "$HOME/Sites/cmg/cmg_dev" ]
+    then
+	mkdir -p "${HOME}/Sites/cmg/cmg_dev"
+fi
+
+rsync -rav /Volumes/devel/cms_alpha/ "${HOME}/Sites/cmg/cms_dev/"
