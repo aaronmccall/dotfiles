@@ -4,4 +4,4 @@ if [ ! -d "$HOME/Sites/cmg/cmg_dev" ]
 	mkdir -p "${HOME}/Sites/cmg/cmg_dev"
 fi
 
-rsync -rav /Volumes/devel/cms_alpha/ "${HOME}/Sites/cmg/cms_dev/"
+rsync -rav -e "ssh -Y -A -l cmg" vbox:/opt/devel/cms_alpha/ "${HOME}/Sites/cmg/cms_dev/"
